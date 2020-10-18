@@ -19,7 +19,7 @@ Information gain 0.007214618474517431
 
 ![Explanation](images/explanation.png "Explanation")
 
-The functions and the used formulas can be found in decisionCompass.ts
+The functions and the used formulas can be found in [decisionCompass.ts](src/decisionCompass.ts)
 
 ### Running
 
