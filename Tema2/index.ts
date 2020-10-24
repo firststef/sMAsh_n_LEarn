@@ -1,5 +1,5 @@
 'use strict';
-import * as cp from './decisionCompass';
+import * as cp from '../library/decisionCompass';
 
 
 (function main(){

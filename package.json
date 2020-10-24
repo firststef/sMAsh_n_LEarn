@@ -1,0 +1,18 @@
+{
+  "name": "teme-ml",
+  "version": "1.0.0",
+  "description": "ML Homework: computing diverse values for a decision compass, etc.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc && node out/test/test.js",
+    "start": "tsc && node out/src/index.js",
+    "debug": "tsc && node --nolazy ./out/src/index.js"
+  },
+  "author": "firststef",
+  "license": "ISC",
+  "devDependencies": {
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.3"
+  },
+  "dependencies": {}
+}
