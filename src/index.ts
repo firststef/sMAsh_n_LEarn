@@ -1,0 +1,1 @@
+import '../Tema2/index';
