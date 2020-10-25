@@ -38,7 +38,7 @@ export class DecisionCompass {
         let rootPartitionArr: Array<number> = new Array<number>(this.numOfOutputValues).fill(0);
         this.listOfPartitions.forEach((part: Partition, index) => {
             for (let i = 0; i < this.numOfOutputValues; ++i){
-                rootPartitionArr[index] += part.elements[i];
+                rootPartitionArr[i] += part.elements[i];
             }
         });
         this.rootPartition = new Partition(rootPartitionArr);
