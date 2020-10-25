@@ -23,4 +23,6 @@ import {ID3Algorithm } from '../library/id3';
     let model = algor.train();
     model.show();
 
+    console.log('Solving ' + ['N','3','S','Y'].toString(), 'Answer: ', model.solve(['N','3','S','Y']) );
+
 })();

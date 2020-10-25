@@ -43,7 +43,6 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
         if (condEntropies?.every((c)=>c.entropy == 0)){
             currentNode['node'] = condEntropies[0].attr;
             currentNode['partitions'] = condEntropies[0].partitions;
-            currentNode['partitions'] = condEntropies[0].partitions;
             condEntropies[0].values.forEach((val) => {
                 currentNode[val] = {};
             });
@@ -58,8 +57,12 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
             currentNode['partitions'] = partitions?.find((p) => p.attr == chosenAttr)?.partitions;
             partitions?.find((p) => p.attr == chosenAttr)?.values.forEach((val, iv) => {
                 currentNode[val] = {};
-                if (partitions?.find((p) => p.attr == chosenAttr)?.partitions[iv].elements.includes(0)){
-                    return;
+                let partE = partitions?.find((p) => p.attr == chosenAttr);
+                for (let ii = 0; partE && ii < partE.partitions[iv].elements.length; ++ii){
+                    if (partE.partitions[iv].elements[ii] == 0 && thisRef.table){
+                        currentNode[val]["value"] = thisRef.table.table()[0][thisRef.table.colOfOut()];
+                        return;
+                    }
                 }
                 let newNode = {};
                 thisRef.table?.clone();
