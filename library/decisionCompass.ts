@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-class Partition{
+export class Partition{
     elements: number[];
 
     constructor(elements:number[]){
@@ -18,13 +18,19 @@ class Partition{
     }
 }
 
-class DecisionCompass {
+export class DecisionCompass {
     numOfOutputValues: number;
     numOfAttributes: number;
     listOfPartitions: Partition[];
     rootPartition: Partition;
 
-    constructor(numOfOutputValues: number, numOfAttributes: number, listOfPartitions: Partition[]){
+    constructor(listOfPartitions: Partition[], numOfOutputValues: number = -1, numOfAttributes: number = -1){
+        if (numOfAttributes == -1){
+            listOfPartitions.length;
+        }
+        if (numOfOutputValues == -1){
+            numOfOutputValues = listOfPartitions[0].elements.length;
+        }
         this.numOfOutputValues = numOfOutputValues;
         this.numOfAttributes = numOfAttributes;
         this.numOfAttributes = numOfAttributes;
@@ -64,10 +70,10 @@ class DecisionCompass {
     }
 }
 
-export function getDecisionCompass1(){
-    let lines = fs.readFileSync('./files/1.txt').toString().split('\n');
+export function getDecisionCompass(p: string){
+    let lines = fs.readFileSync(p).toString().split('\n');
     let numOfOutputValues = Number(lines[0]);
     let numOfAttributes = Number(lines[1]);
-    let listOfPartitions:Partition[] = JSON.parse(lines[2]).map((el: number[]) =>  new Partition(el));
-    return new DecisionCompass(numOfOutputValues, numOfAttributes, listOfPartitions);
+    let listOfPartitions: Partition[] = JSON.parse(lines[2]).map((el: number[]) =>  new Partition(el));
+    return new DecisionCompass(listOfPartitions, numOfOutputValues, numOfAttributes);
 }
