@@ -25,6 +25,11 @@ model.show();
 Output:
 ```js
 {
+  node: 'Legs',
+  partitions: [
+    Partition { elements: [ 2, 5 ] },
+    Partition { elements: [ 3, 0 ] }
+  ],
   '2': {
     node: 'Green',
     partitions: [
@@ -58,12 +63,7 @@ Output:
       T: {}
     }
   },
-  '3': {},
-  node: 'Legs',
-  partitions: [
-    Partition { elements: [ 2, 5 ] },
-    Partition { elements: [ 3, 0 ] }
-  ]
+  '3': {}
 }
 ```
 
