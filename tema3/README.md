@@ -67,4 +67,10 @@ Output:
 }
 ```
 
+Testing:
+
+```js
+model.solve(['N','3','S','Y']); // Solving N,3,S,Y Answer:  M
+```
+
 The functions and the used formulas can be found in [lib](../library/)
