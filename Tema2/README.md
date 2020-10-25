@@ -19,9 +19,4 @@ Information gain 0.007214618474517431
 
 ![Explanation](images/explanation.png "Explanation")
 
-The functions and the used formulas can be found in [decisionCompass.ts](src/decisionCompass.ts)
-
-### Running
-
-You will need node and npm.
-Type `npm install && npm run start` in this directory.
+The functions and the used formulas can be found in [decisionCompass.ts](../library/decisionCompass.ts)
