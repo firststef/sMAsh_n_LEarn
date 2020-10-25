@@ -20,7 +20,7 @@ import {ID3Algorithm } from '../library/id3';
             ['N','2','T','Y','H']
         ]
     ));
-    algor.train();
-    algor.show();
+    let model = algor.train();
+    model.show();
 
 })();

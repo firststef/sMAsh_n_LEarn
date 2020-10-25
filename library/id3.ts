@@ -1,49 +1,84 @@
 import {ModelCreatorAlgorithm, Model} from './modelCreator';
 import {DecisionCompass, Partition} from './decisionCompass';
+import {DecisionTree} from './decisionTree';
 
-export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType, OutType>{
-    train(): Model<InType, OutType>{
-        let model: Model<InType, OutType> = new Model();
-
+export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType, OutType, DecisionTree>{
+    recurseTravel(currentNode: {[key: string]: any}){
         let thisRef = this;
-        while(this.table?.length()){
-            let outValues:{[key: string]: any} = {};
-            this.table?.tempValue?.forEach(
-                (row) => {
-                    if (thisRef.table && thisRef.table?.tempValue){
-                        outValues[String(row[thisRef.table?.outIndex])] = 0;
-                    }
-                }
-            )
-            let condEntropies = this.table.head?.filter((attr, ia) => ia != this.table?.outIndex).map(
-                (attr, ia) => {
-                    let inValueFreq: {[key: string]: any}= {};
-                    this.table?.tempValue?.forEach(
-                        (row, ir) => {
-                            if (thisRef.table?.outIndex){
-                                if (String(row[ia]) in inValueFreq){
-                                    if (!(String(row[thisRef.table?.outIndex]) in inValueFreq[String(row[ia])])){
-                                        inValueFreq[String(row[ia])][String(row[thisRef.table?.outIndex])] = 0;
-                                    }
-                                    inValueFreq[String(row[ia])][String(row[thisRef.table?.outIndex])]++;
-                                }
-                                else{
-                                    inValueFreq[String(row[ia])] = {...outValues};
-                                    inValueFreq[String(row[ia])][String(row[thisRef.table?.outIndex])] = 1;
-                                }
-                            }
-                        }
-                    )
 
-                    return (new DecisionCompass(Object.keys(inValueFreq).map((k: string) => new Partition(Object.values(inValueFreq[k]))))).averageConditionalEntropy();
-                }
-            );
+        if(this.table == undefined){
+            return;
         }
 
-        return model;
+        let possibleValues = this.table.possibleValues();
+        let partitions = this.table.names().filter((attr, ia) => attr != thisRef.table?.outAttr).map(
+            (attr, ia) => {
+                let inValueFreq: {[key: string]: any}= JSON.parse(JSON.stringify(possibleValues[attr]));
+                this.table?.table().forEach(
+                    (row, ir) => {
+                        if (thisRef.table?.colOfOut()){
+                            inValueFreq[String(row[ia])][String(row[thisRef.table?.colOfOut()])]++;
+                        }
+                    }
+                );
+                
+                return {
+                    attr: attr, 
+                    partitions: Object.keys(inValueFreq).map(
+                        (k: string) => new Partition(Object.values(inValueFreq[k]))
+                    ),
+                    values: Object.keys(inValueFreq)
+                };
+            }
+        );
+        let condEntropies = partitions?.map(
+            (part) => {
+                return {
+                    ...part,
+                    entropy: (new DecisionCompass(part.partitions)).averageConditionalEntropy(),
+                }
+            }
+        );
+
+        if (condEntropies?.every((c)=>c.entropy == 0)){
+            currentNode['node'] = condEntropies[0].attr;
+            currentNode['partitions'] = condEntropies[0].partitions;
+            currentNode['partitions'] = condEntropies[0].partitions;
+            condEntropies[0].values.forEach((val) => {
+                currentNode[val] = {};
+            });
+            return;
+        }
+        
+        let entropies = condEntropies?.map((el) => el.entropy);
+        if (condEntropies && entropies){
+            let chosenIndex = entropies.indexOf(Math.min.apply(Math, entropies));
+            let chosenAttr = condEntropies[chosenIndex].attr;
+            currentNode['node'] = chosenAttr;
+            currentNode['partitions'] = partitions?.find((p) => p.attr == chosenAttr)?.partitions;
+            partitions?.find((p) => p.attr == chosenAttr)?.values.forEach((val, iv) => {
+                currentNode[val] = {};
+                if (partitions?.find((p) => p.attr == chosenAttr)?.partitions[iv].elements.includes(0)){
+                    return;
+                }
+                let newNode = {};
+                thisRef.table?.clone();
+                thisRef.table?.filter(
+                    (row: Array<any>) => thisRef.table && row[thisRef.table.colOf(chosenAttr)] == val
+                );
+                thisRef.table?.popAttr(chosenAttr);
+                thisRef.recurseTravel(newNode);
+                thisRef.table?.crush();
+                currentNode[val] = newNode;
+            });
+        }
     }
 
-    show(): void{
-        console.log('arbore');
+    train(): DecisionTree{
+        let model:DecisionTree = new DecisionTree();
+
+        this.recurseTravel(model.tree);
+
+        return model;
     }
 }
