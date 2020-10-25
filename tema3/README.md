@@ -30,7 +30,6 @@ Output:
     Partition { elements: [ 2, 5 ] },
     Partition { elements: [ 3, 0 ] }
   ],
-  '3': { value: 'M' },
   '2': {
     node: 'Green',
     partitions: [
@@ -50,9 +49,9 @@ Output:
           Partition { elements: [ 0, 1 ] }
         ],
         Y: { value: 'M' },
-        N: { value: 'M' }
+        N: { value: 'H' }
       },
-      T: { value: 'M' }
+      T: { value: 'H' }
     },
     Y: {
       node: 'Height',
@@ -60,10 +59,11 @@ Output:
         Partition { elements: [ 0, 1 ] },
         Partition { elements: [ 1, 0 ] }
       ],
-      S: { value: 'M' },
+      S: { value: 'H' },
       T: { value: 'M' }
     }
-  }
+  },
+  '3': { value: 'M' }
 }
 ```
 

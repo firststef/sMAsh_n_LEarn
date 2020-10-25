@@ -11,7 +11,7 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
         }
 
         let possibleValues = this.table.possibleValues();
-        let partitions = this.table.names().filter((attr, ia) => attr != thisRef.table?.outAttr).map(
+        let children = this.table.names().filter((attr, ia) => attr != thisRef.table?.outAttr).map(
             (attr, ia) => {
                 let inValueFreq: {[key: string]: any}= JSON.parse(JSON.stringify(possibleValues[attr]));
                 this.table?.table().forEach(
@@ -27,15 +27,18 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
                     partitions: Object.keys(inValueFreq).map(
                         (k: string) => new Partition(Object.values(inValueFreq[k]))
                     ),
-                    values: Object.keys(inValueFreq)
+                    values: Object.keys(inValueFreq),
+                    finalValues: Object.keys(inValueFreq).map(
+                        (k: string) => Object.keys(inValueFreq[k])
+                    ),
                 };
             }
         );
-        let condEntropies = partitions?.map(
-            (part) => {
+        let condEntropies = children?.map(
+            (child) => {
                 return {
-                    ...part,
-                    entropy: (new DecisionCompass(part.partitions)).averageConditionalEntropy(),
+                    ...child,
+                    entropy: (new DecisionCompass(child.partitions)).averageConditionalEntropy(),
                 }
             }
         );
@@ -43,9 +46,16 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
         if (condEntropies?.every((c)=>c.entropy == 0)){
             currentNode['node'] = condEntropies[0].attr;
             currentNode['partitions'] = condEntropies[0].partitions;
-            condEntropies[0].values.forEach((val) => {
+
+            let chosenChild =  condEntropies[0];
+            chosenChild?.values.forEach((val, iv) => {
                 currentNode[val] = {};
-                currentNode[val]["value"] = thisRef.table?.table()[0][thisRef.table.colOfOut()]
+                for (let ii = 0; chosenChild && ii < chosenChild.partitions[iv].elements.length; ++ii){
+                    if (chosenChild.partitions[iv].elements[ii] != 0){
+                        currentNode[val]["value"] = chosenChild.finalValues[iv][ii];
+                        return;
+                    }
+                }
             });
             return;
         }
@@ -55,14 +65,16 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
             let chosenIndex = entropies.indexOf(Math.min.apply(Math, entropies));
             let chosenAttr = condEntropies[chosenIndex].attr;
             currentNode['node'] = chosenAttr;
-            currentNode['partitions'] = partitions?.find((p) => p.attr == chosenAttr)?.partitions;
-            partitions?.find((p) => p.attr == chosenAttr)?.values.forEach((val, iv) => {
+            let chosenChild =  children?.find((p) => p.attr == chosenAttr);
+            currentNode['partitions'] = chosenChild?.partitions;
+            chosenChild?.values.forEach((val, iv) => {
                 currentNode[val] = {};
-                let partE = partitions?.find((p) => p.attr == chosenAttr);
-                for (let ii = 0; partE && ii < partE.partitions[iv].elements.length; ++ii){
-                    if (partE.partitions[iv].elements[ii] == 0 && thisRef.table){
-                        currentNode[val]["value"] = thisRef.table.table()[0][thisRef.table.colOfOut()];
-                        return;
+                if (chosenChild?.partitions[iv].elements.some((el) => el == 0)){
+                    for (let ii = 0; chosenChild && ii < chosenChild.partitions[iv].elements.length; ++ii){
+                        if (chosenChild.partitions[iv].elements[ii] != 0){
+                            currentNode[val]["value"] = chosenChild.finalValues[iv][ii];
+                            return;
+                        }
                     }
                 }
                 let newNode = {};
