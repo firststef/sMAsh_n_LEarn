@@ -23,7 +23,7 @@ model.show();
 ```
 
 Output:
-```json
+```js
 {
   '2': {
     node: 'Green',
