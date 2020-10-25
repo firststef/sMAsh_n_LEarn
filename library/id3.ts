@@ -45,6 +45,7 @@ export class ID3Algorithm<InType, OutType> extends ModelCreatorAlgorithm<InType,
             currentNode['partitions'] = condEntropies[0].partitions;
             condEntropies[0].values.forEach((val) => {
                 currentNode[val] = {};
+                currentNode[val]["value"] = thisRef.table?.table()[0][thisRef.table.colOfOut()]
             });
             return;
         }
